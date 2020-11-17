@@ -1,0 +1,28 @@
+{
+    "name": "js-exec-utils",
+    "version": "0.1.0",
+    "author": "NicoNing<dodoru@foxmail.com>",
+    "license": "MIT",
+    "description": "common utils for nodejs chore/tasks/scripts/commands to execute",
+    "main": "index.js",
+    "scripts": {
+        "pretest": "eslint .",
+        "test": ""
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/dodoru/js-exec-utils.git",
+        "url2": "git@gitee.com:dodoru/js-exec-utils.git"
+    },
+    "keywords": [
+        "nodejs",
+        "exec",
+        "scripts",
+        "manage",
+        "cli",
+        "execute in shell"
+    ],
+    "devDependencies": {
+        "eslint": "^7.6.0"
+    }
+}
