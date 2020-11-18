@@ -5,6 +5,7 @@
 .git*
 .npmrc
 .gitignore
+.editorconfig
 .*
 
 */.idea/*
@@ -26,6 +27,12 @@ sample/node_modules
 *.swp
 *.log
 *.bak.*
+*.tmp.*
 
+*.bak/
+*.tmp/
+
+bak@*/
+tmp@*/
 
 

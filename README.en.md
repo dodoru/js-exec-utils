@@ -1,7 +1,8 @@
 # js-exec-utils
 
 #### Description
-execute JsScript/JsModule/JsPackage in shell 
+
+nodejs: Execute script/module/package/function in shell 
 
 #### Installation
 

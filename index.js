@@ -1,4 +1,4 @@
-const child_process = require('child_process');
+const child_process = require("child_process");
 
 function bool_val(v) {
     if (!v) {
@@ -46,7 +46,7 @@ const self = module.exports = {
                 let code = 0;
                 self._log(`[cmd]:${cmd}\n[stdout]:${stdout}\n[stderr]:${stderr}`);
                 if (error) {
-                    console.log('[ERROR]', error);
+                    console.log("[ERROR]", error);
                     reject(error);
                     code = 1;
                 } else {
@@ -91,7 +91,7 @@ const self = module.exports = {
         }
         console.log(`[tips] ${jobModule.tips} \n`);
         if (jobModule.config) {
-            console.log(`[config]: ${JSON.stringify(jobModule.config, null, 2)}\n`);
+            console.log(`[config]: ${self.stringify(jobModule.config, 2, 2)}\n`);
         }
         // ignore function's name startsWith "_"
         console.log("[Functions]: ");
@@ -100,7 +100,7 @@ const self = module.exports = {
                 let pf = jobModule[k];
                 if (pf instanceof Function) {
                     let desc = pf.toString().split("=>")[0];
-                    console.log(`  ${k.padEnd(32, ' ')} : ${desc}`);
+                    console.log(`  ${k.padEnd(32, " ")} : ${desc}`);
                 }
             }
         }
@@ -122,34 +122,38 @@ const self = module.exports = {
                 let pf = jobModule[k];
                 if (!(pf instanceof Function)) {
                     let desc = pf.toString().split("=>")[0];
-                    console.log(`  ${k.padEnd(32, ' ')} : ${desc}`);
+                    console.log(`  ${k.padEnd(32, " ")} : ${desc}`);
                 }
             }
         }
         process.exit(0);
     },
 
-    stringify: (obj, depth = 0) => {
-        if ((obj instanceof Object) && depth >= 0) {
-            if (obj.toJSON) {
-                return obj.toJSON();
-            }
-            let res = {};
-            for (let k in obj) {
-                if (!k.startsWith("_")) {
-                    let v = obj[k];
-                    if (v instanceof Function) {
-                        if (self.config.DEBUG) {
-                            res[k] = "$Funciton";
+    stringify: (obj, depth = 0, indent_space = 2) => {
+        try {
+            return JSON.stringify(obj, null, indent_space);
+        } catch (e) {
+            if ((obj instanceof Object) && depth >= 0) {
+                if (obj.toJSON instanceof Function) {
+                    return obj.toJSON();
+                }
+                let res = {};
+                for (let k in obj) {
+                    if (!k.startsWith("_")) {
+                        let v = obj[k];
+                        if (v instanceof Function) {
+                            if (self.config.DEBUG) {
+                                res[k] = "$Funciton";
+                            }
+                        } else {
+                            res[k] = self.stringify(v, depth - 1, indent_space);
                         }
-                    } else {
-                        res[k] = self.stringify(v, depth - 1);
                     }
                 }
+                return JSON.stringify(res, null, 2);
+            } else {
+                return `${obj}`;
             }
-            return JSON.stringify(res, null, 2);
-        } else {
-            return `${obj}`;
         }
     },
 
