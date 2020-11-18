@@ -18,8 +18,14 @@ test/
 test-browser/
 .travis.yml
 
+sample/package.json
+sample/package-lock.json
+sample/node_modules
+*/node_modules
+
 *.swp
 *.log
 *.bak.*
+
 
 
