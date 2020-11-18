@@ -1,6 +1,6 @@
 {
     "name": "js-exec-utils",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "author": "NicoNing<dodoru@foxmail.com>",
     "license": "MIT",
     "description": "common utils for nodejs chore/tasks/scripts/commands to execute",
