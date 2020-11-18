@@ -1,9 +1,9 @@
 {
     "name": "js-exec-utils",
-    "version": "0.2.0",
+    "version": "1.0.0",
     "author": "NicoNing<dodoru@foxmail.com>",
     "license": "MIT",
-    "description": "common utils for nodejs chore/tasks/scripts/commands to execute",
+    "description": "nodejs: Execute script/module/package/function in shell",
     "main": "index.js",
     "scripts": {
         "pretest": "eslint .",
