@@ -16,10 +16,12 @@ function bool_val(v) {
 
 const self = module.exports = {
     name: "js-exec-utils",
-    tips: "manage js-scripts and execute your script commands. \n\n eg: node JsScriptOrPackage descJobFuncs",
+    tips: "manage js-scripts and execute your script commands. \n\n eg: node script.js funcName [...args]",
     logger: global.logger || console,
     config: {
+        DEBUG: bool_val(process.env.DEBUG),
         LOG_LEVEL: process.env.LOG_LEVEL || "info",       // default:info ;  debug, info, warn, error, trace
+        LOG_DEPTH: parseInt(process.env.LOG_DEPTH) || 0,  // default: 0   ;  loop depth of stringify object
         DISABLE_LOOP: bool_val(process.env.DISABLE_LOOP), // default:false ; don't run sub-job
     },
     _log: (...args) => {
@@ -61,26 +63,20 @@ const self = module.exports = {
     },
 
     execModule: async (jobModule, funcName, ...funcArgs) => {
-        self._ = self;
         // support loop to execute sub-job of jobModule by setting process.env.DISABLE_LOOP = True
-        let t1 = new Date();
-        self._log(`[start]${t1.toJSON()}`, jobModule.name || "", funcName, ...funcArgs);
         const func = jobModule[funcName];
         if (func instanceof Function) {
             let res = await func(...funcArgs);
-            self._log("[RES]: ", res);
-            self._log_ts(t1);
             return res;
         } else if (func !== undefined) {
             if ((funcArgs.length > 0) && (func instanceof Object) && !self.config.DISABLE_LOOP) {
                 return self.execModule(func, ...funcArgs);
             } else {
-                self._log(`[${jobModule.name || ""}.${funcName}]=${func}`);  // funcName => Attribute Arguments
+                self._log(`[$.${funcName}]=${func}`);  // funcName => Attribute Arguments
                 return func;
             }
         } else {
-            self.descJobFuncs(jobModule);
-            process.exit(1);
+            throw new Error(`$.${funcName}(${funcArgs}) is undefined`);
         }
     },
 
@@ -133,18 +129,47 @@ const self = module.exports = {
         process.exit(0);
     },
 
+    stringify: (obj, depth = 0) => {
+        if ((obj instanceof Object) && depth >= 0) {
+            if (obj.toJSON) {
+                return obj.toJSON();
+            }
+            let res = {};
+            for (let k in obj) {
+                if (!k.startsWith("_")) {
+                    let v = obj[k];
+                    if (v instanceof Function) {
+                        if (self.config.DEBUG) {
+                            res[k] = "$Funciton";
+                        }
+                    } else {
+                        res[k] = self.stringify(v, depth - 1);
+                    }
+                }
+            }
+            return JSON.stringify(res, null, 2);
+        } else {
+            return `${obj}`;
+        }
+    },
+
     runIfMain: (filename, exports) => {
         if (process.mainModule.filename === filename) {
             const args = process.argv.splice(2);
-            if (args) {
+            if (args.length > 0) {
                 let t1 = new Date();
                 self.execModule(exports, ...args).then(res => {
-                    self._log(`[RES]: ${res}`);
+                    self._log(`[RES]: ${self.stringify(res, self.config.LOG_DEPTH)}`);
                     self._log_ts(t1);
                     process.exit(0);
+                }).catch(err => {
+                    self._log(`[ERROR]: ${err.message} at file:${filename}`);
+                    self.descJobFuncs(exports);
+                    process.exit(1);
                 });
             } else {
                 self.descJobFuncs(exports);
+                process.exit(1);
             }
         }
     },
