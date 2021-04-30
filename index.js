@@ -104,7 +104,6 @@ const self = module.exports = {
                 }
             }
         }
-        process.exit(0);
     },
 
     descJobAttrs: (jobModule) => {
@@ -126,7 +125,6 @@ const self = module.exports = {
                 }
             }
         }
-        process.exit(0);
     },
 
     stringify: (obj, depth = 0, indent_space = 2) => {
@@ -157,7 +155,7 @@ const self = module.exports = {
         }
     },
 
-    runIfMain: (filename, exports) => {
+    runIfMain: (filename, exports, exit_ok = true) => {
         if (process.mainModule.filename === filename) {
             const args = process.argv.splice(2);
             if (args.length > 0) {
@@ -165,7 +163,9 @@ const self = module.exports = {
                 self.execModule(exports, ...args).then(res => {
                     self._log(`[RES]: ${self.stringify(res, self.config.LOG_DEPTH)}`);
                     self._log_ts(t1);
-                    process.exit(0);
+                    if (exit_ok) {
+                        process.exit(0);
+                    }
                 }).catch(err => {
                     self._log(`[ERROR]: ${err.message} at file:${filename}`);
                     self.descJobFuncs(exports);
