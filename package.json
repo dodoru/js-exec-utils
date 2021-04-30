@@ -1,6 +1,6 @@
 {
     "name": "js-exec-utils",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "author": "NicoNing<dodoru@foxmail.com>",
     "license": "MIT",
     "description": "nodejs: Execute script/module/package/function in shell",

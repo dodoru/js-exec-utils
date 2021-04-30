@@ -22,7 +22,7 @@ const self = module.exports = {
         DEBUG: bool_val(process.env.DEBUG),
         LOG_LEVEL: process.env.LOG_LEVEL || "info",       // default:info ;  debug, info, warn, error, trace
         LOG_DEPTH: parseInt(process.env.LOG_DEPTH) || 0,  // default: 0   ;  loop depth of stringify object
-        DISABLE_LOOP: bool_val(process.env.DISABLE_LOOP), // default:false ; don't run sub-job
+        DISABLE_LOOP: bool_val(process.env.DISABLE_LOOP), // default:false ; run sub-job
     },
     _log: (...args) => {
         let calv = self.config.LOG_LEVEL.toLowerCase();
@@ -167,7 +167,8 @@ const self = module.exports = {
                         process.exit(0);
                     }
                 }).catch(err => {
-                    self._log(`[ERROR]: ${err.message} at file:${filename}`);
+                    self._log(`[ERROR]: ${err.message}`);
+                    self._log(`[EXEC_FILE]: ${filename}`);
                     self.descJobFuncs(exports);
                     process.exit(1);
                 });
