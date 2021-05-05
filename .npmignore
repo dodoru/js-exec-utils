@@ -36,3 +36,4 @@ bak@*/
 tmp@*/
 
 
+include ".gitignore"

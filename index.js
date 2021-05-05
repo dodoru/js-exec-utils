@@ -154,7 +154,7 @@ const self = module.exports = {
         }
         // ignore function's name startsWith "_"
         console.log("[Functions]: ");
-        for (let k of Object.getOwnPropertyNames(jobModule)) {
+        for (let k of Object.keys(jobModule)) {
             if (!k.startsWith("_")) {
                 let pf = jobModule[k];
                 if (pf instanceof Function) {
@@ -165,16 +165,14 @@ const self = module.exports = {
         }
     },
 
-    descJobAttrs: (jobModule, attr = "**") => {
+    descJobAttrs: (jobModule) => {
         // ignore the _attributes (prefix with "_")
-        let attrs = Object.keys(jobModule);
-        if (attrs.length > 0 && attr === "**") {
-            for (let k of attrs) {
-                if (!k.startsWith("_")) {
-                    let pf = jobModule[k];
-                    let pfv = self.parseValue(pf);
-                    self._log(`  ${k.padEnd(32, " ")} : ${pfv.repr}`);
-                }
+        let attrs = Object.getOwnPropertyNames(jobModule);
+        for (let k of attrs) {
+            if (!k.startsWith("_")) {
+                let pf = jobModule[k];
+                let pfv = self.parseValue(pf);
+                self._log(`  ${k.padEnd(32, " ")} : ${pfv.repr}`);
             }
         }
     },
@@ -236,13 +234,15 @@ const self = module.exports = {
     manageIfMain: (filename, jobs_index, exit_ok = true) => {
         if (process.mainModule.filename === filename) {
             const job = jobs_index[process.argv[2]] || jobs_index[`${process.argv[2]}.js`];
-            self._log(self.reprJobProperty(jobs_index, "tips"));
             if (!job) {
-                self._log("[jobs]:");
-                for (let idx of Object.keys(jobs_index)) {
-                    let tk = jobs_index[idx];
-                    if (typeof (tk) === "object" && tk.tips) {
-                        self._log(self.reprJobProperty(tk, "tips"));
+                self._log(self.reprJobProperty(jobs_index, "tips"));
+                for (let idx of Object.entries(jobs_index)) {
+                    let tk = jobs_index[idx[1]];
+                    if (typeof (tk) === "object" && tk.name) {
+                        self._log(`[job-${idx[0]}] : ${idx[1]} : ${tk.name}`);
+                        if (tk.tips) {
+                            self._log(self.reprJobProperty(tk, "tips"));
+                        }
                     } else {
                         self._log(self.parseValue(tk).repr);
                     }
@@ -251,7 +251,6 @@ const self = module.exports = {
             } else {
                 self.runIfMain(filename, jobs_index, exit_ok);
             }
-
         }
     },
 };
